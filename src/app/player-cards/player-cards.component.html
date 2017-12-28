@@ -1,0 +1,78 @@
+<div class="input-field col s10">
+  <div class="row">
+    <div class="col s9">
+      <div class="row">
+        <div class="col offset-s1">
+          <div class="card red valign-wrapper center-align" style="height: 200px; width:150px;display: inline-block;font:40px/60px Georgia, Times New Roman, serif">
+            <div class="card-content white-text">
+              <p style="font:40px/60px Georgia, Times New Roman, serif"><i class="material-icons mdi mdi-animation"></i>{{bluffed["totalCardCount"]}}</p>
+            </div>
+          </div>
+        </div>
+        <div class="col s4 m4 center-align">
+          <div class="card red lighten-5 hoverable valign-wrapper center-align" style="height: 200px; width:150px;display: inline-block;font:40px/60px Georgia, Times New Roman, serif">
+            <h1 *ngIf="bluffed['cardRank'] != 'null'" class="red-text" style="font:100px/160px Georgia, Times New Roman, serif">{{bluffed["cardRank"]}}</h1>
+          </div>
+        </div>
+        <div class="col s4 m4 left-align">
+          <div class="card red valign-wrapper center-align" style="height: 200px; width:150px;display: inline-block;font:40px/60px Georgia, Times New Roman, serif">
+            <div class="card-content white-text">
+              <p style="font:40px/60px Georgia, Times New Roman, serif"><i class="material-icons mdi mdi-animation"></i>{{bluffed["cardCount"]}}</p>
+              <p>{{bluffed['playerName']}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col s12">
+          <div *ngFor="let card of cards" (click)="selectCard($event, card)" class="card red lighten-5 hoverable valign-wrapper center-align" style="height: 150px; width:100px;display: inline-block;font:40px/60px Georgia, Times New Roman, serif">
+            <div class="card-content green-text">
+              <p>{{card['rank']}}</p>
+                <span *ngIf="card['suit'] == 'Club'" style="color:black">♣</span>
+                <span *ngIf="card['suit'] == 'Diamond'" style="color:red">♦</span>
+                <span *ngIf="card['suit'] == 'Heart'" style="color: red">♥</span>
+                <span *ngIf="card['suit'] == 'Spade'" style="color:black">♠</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col s11 border">
+          <div *ngFor="let card of openCards" class="card red lighten-5 hoverable valign-wrapper center-align" style="height: 150px; width:100px;display: inline-block;font:40px/60px Georgia, Times New Roman, serif">
+            <div class="card-content green-text">
+              <p>{{card['rank']}}</p>
+              <span *ngIf="card['suit'] == 'Club'" style="color:black">♣</span>
+              <span *ngIf="card['suit'] == 'Diamond'" style="color:red">♦</span>
+              <span *ngIf="card['suit'] == 'Heart'" style="color: red">♥</span>
+              <span *ngIf="card['suit'] == 'Spade'" style="color:black">♠</span>
+            </div>
+          </div>
+          <div *ngIf="openCards.length != 0" class="col s1"><a class="blue-text" (click)="clearOpenCards()"><i class="red-text material-icons mdi mdi-close-outline"></i></a></div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="isPlayerActive && bluffed['cardRank'] == 'null'" class="col s1 red z-depth-3">
+      <ul class="collection">
+        <a class="collection-item center" *ngFor="let rank of cardRanks" (click)="selectRank($event, rank)" id="{{rank}}">
+            {{rank}}
+        </a>
+      </ul>
+    </div>
+    <div *ngIf="isPlayerActive" class="col s2 red z-depth-3">
+      <ul class="collection">
+        <li class="collection-item center">
+          <!--<select *ngIf="isBluffedRankNull" [(ngModel)]=bluffedCardRank class="browser-default">-->
+            <!--<option *ngFor="let rank of cardRanks" [value]="rank">{{rank}}</option>-->
+          <!--</select>-->
+          <a class="btn-floating btn-large waves-effect waves-light red pulse" alt="throw cards" (click)="throwCards()"><i class="material-icons">play_circle_filled</i></a>
+        </li>
+        <li *ngIf="bluffed['cardRank'] != 'null'" class="collection-item center">
+          <a class="btn-floating btn-large waves-effect waves-light red pulse" alt="show cards" (click)="show()"><i class="material-icons mdi mdi-eye-outline"></i></a>
+        </li>
+        <li *ngIf="bluffed['cardRank'] != 'null'" class="collection-item center">
+          <a class="btn-floating btn-large waves-effect waves-light red pulse" alt="pass" (click)="pass()"><i class="material-icons">skip_next</i></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
