@@ -1,5 +1,7 @@
 # CardsGameUi
 
+[![Build status](https://travis-ci.org/rajatthareja/CardsGameUi.svg?branch=master)](https://travis-ci.org/rajatthareja/CardsGameUi)
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.5.4.
 
 ## Development server
@@ -25,3 +27,12 @@ Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protrac
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+
+## Collaborators
+
+* [Rajat Thareja](http://rajatthareja.com)
+* [Muneiah](https://github.com/muneiah)
+
+## License
+
+Copyright (c) 2017 [MIT LICENSE](LICENSE)
