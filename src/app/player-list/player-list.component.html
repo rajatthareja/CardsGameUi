@@ -1,4 +1,10 @@
-<div *ngIf="playersIds.length > 0" class="input-field col s2 red z-depth-3">
+<div class="col s5 show-on-small hide-on-med-and-up">
+  <span *ngFor="let id of playersIds" class="collection-item green-text">
+    <i *ngIf="activePlayerId == id" class="material-icons mdi mdi-account-circle"></i>
+    <span *ngIf="activePlayerId == id">{{players[id]}}</span>
+  </span>
+</div>
+<div *ngIf="playersIds.length > 0" class="input-field col m2 red z-depth-3 hide-on-small-only">
   <ul class="collection">
     <li *ngFor="let winner of winners; let i = index" [attr.data-index]="i" class="collection-item">
       <i *ngIf="i < 3" class="material-icons mdi mdi-crown {{winnerColors[i]}}"></i>
