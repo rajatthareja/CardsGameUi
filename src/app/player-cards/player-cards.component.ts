@@ -13,6 +13,8 @@ export class PlayerCardsComponent implements OnInit {
   bluffedCardRank = '';
   bluffed = {};
   openCards = [];
+  info = [];
+  infoIcon = '>>';
 
   getBluffedData() {
     this.service.bluffed().subscribe(bluffed => {
@@ -55,6 +57,16 @@ export class PlayerCardsComponent implements OnInit {
         });
         this.selectedCards = newCards;
       }
+    }
+  }
+
+  getInfo(event){
+    if(this.infoIcon == '>>'){
+      this.info = ['throw', 'show', 'pass'];
+      this.infoIcon = "<<";
+    } else {
+      this.info = ['', '', ''];
+      this.infoIcon = ">>";
     }
   }
 

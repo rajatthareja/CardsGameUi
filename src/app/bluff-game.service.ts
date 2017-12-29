@@ -4,7 +4,7 @@ import {Observable} from "rxjs/Observable";
 
 @Injectable()
 export class BluffGameService {
-  static apiUrl = 'https://cardsgameapi.herokuapp.com/bluff/';
+  static apiUrl = 'http://localhost:8989/bluff/';
   static playerKey = '';
   static playerId = '';
   static activePlayerId = '';

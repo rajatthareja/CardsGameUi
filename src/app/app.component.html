@@ -1,33 +1,33 @@
 <div class="row">
-  <div class="col s3">
+  <div class="col m3">
   </div>
-  <div class="col s6 right-align">
+  <div class="col m6 right-align">
     <div class="row">
-      <div class="input-field col s9">
+      <div class="input-field col m9">
         <div *ngIf="!gameStarted && !playerCreated">
           <i class="material-icons prefix">account_circle</i>
           <input [(ngModel)]=playerName placeholder="Enter Your Name" id="icon_prefix" type="text" class="validate"/>
         </div>
       </div>
-      <div class="input-field col s3 left-align">
+      <div class="input-field col m3 left-align">
         <a *ngIf="!gameStarted && !playerCreated" class="btn-floating btn-large waves-effect waves-light red"
            (click)="createPlayer()"><i class="material-icons">add</i>
         </a>
       </div>
     </div>
     <div class="row">
-      <div class="input-field col s9">
-        <div *ngIf="!gameStarted && playerCreated" class="input-field col s9 left-align">
+      <div class="input-field col m9">
+        <div *ngIf="!gameStarted && playerCreated" class="input-field col m9 left-align">
           Deck Count: <b>{{deckCount}}</b><input id="count" type="range" [(ngModel)]=deckCount min="1" max="10"/>
         </div>
-        <div *ngIf="!gameStarted && playerCreated" class="input-field col s3 left-align">
+        <div *ngIf="!gameStarted && playerCreated" class="input-field col m3 left-align">
           <a class="btn-floating btn-large waves-effect waves-light red" (click)="startGame()"><i
             class="material-icons">send</i></a>
         </div>
       </div>
     </div>
   </div>
-  <div class="col s3 right-align">
+  <div class="col m3 right-align">
     <h3>{{ playerName }}
       <a *ngIf="playerCreated" class="btn-floating btn-large waves-effect waves-light red" (click)="leaveGame()"><i
         class="material-icons">exit_to_app</i></a>

@@ -1,12 +1,10 @@
 <div *ngIf="playersIds.length > 0" class="input-field col s2 red z-depth-3">
   <ul class="collection">
     <li *ngFor="let winner of winners; let i = index" [attr.data-index]="i" class="collection-item">
-      <i *ngIf="i == 0" class="material-icons yellow-text text-darken-2 mdi mdi-crown"></i>
-      <b *ngIf="i == 0" class="yellow-text text-darken-2">{{winner}}</b>
-      <i *ngIf="i == 1" class="material-icons grey-text text-darken-2 mdi mdi-crown"></i>
-      <b *ngIf="i == 1" class="grey-text text-darken-2">{{winner}}</b>
-      <i *ngIf="i > 1" class="material-icons brown-text text-darken-2 mdi mdi-crown"></i>
-      <b *ngIf="i > 1" class="brown-text text-darken-2">{{winner}}</b>
+      <i *ngIf="i < 3" class="material-icons mdi mdi-crown {{winnerColors[i]}}"></i>
+      <b *ngIf="i < 3" class="{{winnerColors[i]}}">{{winner}}</b>
+      <i *ngIf="i >= 3" class="material-icons mdi mdi-crown {{winnerColors[2]}}"></i>
+      <b *ngIf="i >= 3" class="{{winnerColors[2]}}">{{winner}}</b>
     </li>
     <li *ngFor="let id of playersIds" class="collection-item">
       <div>

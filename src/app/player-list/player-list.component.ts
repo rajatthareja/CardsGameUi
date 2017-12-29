@@ -10,6 +10,7 @@ export class PlayerListComponent implements OnInit {
   players = {};
   playersIds = [];
   winners = [];
+  winnerColors = ['yellow-text text-darken-2', 'grey-text text-darken-5', 'brown-text text-darken-2']
 
   get activePlayerId(): string {
     return BluffGameService.activePlayerId;
