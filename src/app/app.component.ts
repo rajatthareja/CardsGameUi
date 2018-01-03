@@ -47,7 +47,6 @@ export class AppComponent {
         if(message.body) {
           that.players = JSON.parse(message.body);
           that.playersIds = Object.keys(that.players);
-          that.getWinnerList();
         }
       });
       that.stompClient.subscribe("/started", (message) => {
@@ -60,6 +59,8 @@ export class AppComponent {
           that.activePlayerId = message.body;
           that.getCards();
           that.getBluffedData();
+          that.getPlayersList();
+          that.getWinnerList();
         }
       });
     });
@@ -96,7 +97,6 @@ export class AppComponent {
         this.playerCreated = false;
         BluffGameService.playerKey = '';
         this.playerId = '';
-        this.update('players');
         this.update('started');
         this.update('activePlayerId');
       }
@@ -234,7 +234,7 @@ export class AppComponent {
   @HostListener('window:beforeunload', [ '$event' ])
   onUnload(event) {
     if (this.playerCreated) {
-      this.service.leaveGame().subscribe();
+      this.leaveGame();
       event.returnValue = "Are you sure?";
     }
   }
