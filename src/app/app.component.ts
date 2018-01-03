@@ -1,5 +1,7 @@
 import {Component, HostListener} from '@angular/core';
 import {BluffGameService} from "./bluff-game.service";
+import Stomp from 'stompjs';
+import SockJS from 'sockjs-client';
 
 @Component({
   selector: 'app-bluff',
@@ -11,13 +13,81 @@ export class AppComponent {
   playerCreated = false;
   gameStarted = false;
   deckCount = 1;
+  players = {};
+  playersIds = [];
+  winners = [];
+  cards = [];
+  selectedCards = [];
+  selectedBluffedCardRank = '';
+  bluffedCardRank = 'null';
+  bluffed = {};
+  activePlayerId = '';
+  playerId = '';
 
-  constructor(private service: BluffGameService) { }
+  openCards = [];
+  info = [];
+  infoIcon = '>>';
+  winnerColors = ['yellow-text text-darken-2', 'grey-text text-darken-5', 'brown-text text-darken-2'];
+  cardRanks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 
-  startGame() {
-    this.service.startGame(this.deckCount).subscribe(started => {
-      this.gameStarted = started;
+  private socketUrl = 'https://cardsgameapi.herokuapp.com/socket';
+  // private socketUrl = 'http://localhost:8989/socket';
+  private stompClient;
+
+  constructor(private service: BluffGameService) {
+    this.initializeWebSocketConnection();
+  }
+
+  initializeWebSocketConnection(){
+    let ws = new SockJS(this.socketUrl);
+    this.stompClient = Stomp.over(ws);
+    let that = this;
+    this.stompClient.connect({}, function(frame) {
+      that.stompClient.subscribe("/players", (message) => {
+        if(message.body) {
+          that.players = JSON.parse(message.body);
+          that.playersIds = Object.keys(that.players);
+          that.getWinnerList();
+        }
+      });
+      that.stompClient.subscribe("/started", (message) => {
+        if(message.body) {
+          that.gameStarted = message.body == 'true';
+        }
+      });
+      that.stompClient.subscribe("/activePlayerId", (message) => {
+        if(message.body) {
+          that.activePlayerId = message.body;
+          that.getCards();
+          that.getBluffedData();
+        }
+      });
     });
+  }
+
+  update(update: string ) {
+    this.stompClient.send("/app/update", {}, update);
+  }
+
+  get isBluffedRankNull(): boolean {
+    return this.bluffedCardRank == "null";
+  }
+
+  get isPlayerActive(): boolean {
+    return this.playerId == this.activePlayerId
+  }
+
+  createPlayer() {
+    if (this.playerName != '') {
+      if (BluffGameService.playerKey == '') {
+        this.service.createPlayer(this.playerName).subscribe(playerData => {
+          this.playerId = playerData['id'];
+          BluffGameService.playerKey = playerData['key'];
+          this.playerCreated = true;
+          this.update('players');
+        });
+      }
+    }
   }
 
   leaveGame() {
@@ -25,27 +95,140 @@ export class AppComponent {
       if (leave) {
         this.playerCreated = false;
         BluffGameService.playerKey = '';
-        BluffGameService.playerId = '';
+        this.playerId = '';
+        this.update('players');
+        this.update('started');
+        this.update('activePlayerId');
       }
     });
   }
 
-  updateGame() {
+  startGame() {
+    this.service.startGame(this.deckCount).subscribe(started => {
+      this.gameStarted = started;
+      this.update('started');
+      this.update('activePlayerId');
+    });
+  }
+
+  getGameStatus() {
     this.service.isGameStarted().subscribe(started => {
       this.gameStarted = started;
     });
   }
 
-  createPlayer() {
-    if (this.playerName != '') {
-      this.service.createPlayer(this.playerName);
-      this.playerCreated = true;
+  getPlayersList(): void {
+    this.service.getPlayers().subscribe(players => {
+      this.players = players;
+      this.playersIds = Object.keys(this.players);
+    });
+  }
+
+  getWinnerList(): void {
+    this.service.getWinners().subscribe(players => {
+      this.winners = players;
+    });
+  }
+
+  getActivePlayerId(): void {
+    this.service.getActivePlayer().subscribe(playerId => {
+      this.activePlayerId = playerId;
+    });
+  }
+
+  getBluffedData() {
+    this.service.bluffed().subscribe(bluffed => {
+      this.bluffed = bluffed;
+      this.bluffedCardRank = this.bluffed['cardRank']
+    });
+  }
+
+  getCards() {
+    if (BluffGameService.playerKey != '') {
+      this.service.getPlayerCards().subscribe(cards => {
+        this.cards = cards;
+      });
     }
   }
 
+  throwCards() {
+    if (this.selectedCards.length > 0){
+      if (this.selectedBluffedCardRank == '') {
+        this.selectedBluffedCardRank = this.bluffedCardRank;
+      }
+      if (this.selectedBluffedCardRank != 'null'){
+        this.service.throwCards(this.selectedCards, this.selectedBluffedCardRank).subscribe(isThrow => {
+          if (isThrow) {
+            this.selectedCards = [];
+            this.update('activePlayerId');
+            this.selectedBluffedCardRank = '';
+          }
+        });
+      }
+    }
+  }
+
+  show() {
+    this.service.show().subscribe(cards =>{
+      this.openCards = cards;
+      this.update('activePlayerId');
+      this.selectedCards = [];
+    });
+  }
+
+  pass() {
+    this.service.pass().subscribe(isPass => {
+      if (isPass) {
+        this.selectedCards = [];
+        this.update('activePlayerId');
+      }
+    });
+  }
+
+  selectCard(event, card) {
+    if (this.isPlayerActive){
+      if (event.currentTarget.className.search("selected") == -1){
+        event.currentTarget.className = "card red lighten-4 hoverable valign-wrapper center-align selected z-depth-4";
+        this.selectedCards.push(card);
+      } else {
+        event.currentTarget.className = "card red lighten-5 hoverable valign-wrapper center-align";
+        this.selectedCards = this.selectedCards.filter(function (element, index, newCards) {
+          return !(element['rank'] === card['rank'] && element['suit'] === card['suit']);
+        });
+      }
+    }
+  }
+
+  selectRank(event, rank){
+    if (this.selectedBluffedCardRank != ''){
+      for(let rk of event.currentTarget.parentElement.children){
+        rk.className = "collection-item center";
+      }
+    }
+    this.selectedBluffedCardRank = rank;
+    event.currentTarget.className = "collection-item center active";
+  }
+
+  getInfo(event){
+    if(this.infoIcon == '>>'){
+      this.info = ['Throw', 'Show', 'Pass'];
+      this.infoIcon = "<<";
+    } else {
+      this.info = ['', '', ''];
+      this.infoIcon = ">>";
+    }
+  }
+
+  clearOpenCards(){
+    this.openCards = [];
+  }
+
   ngOnInit() {
-    this.updateGame();
-    setInterval(() => this.updateGame(), 1000);
+    this.getGameStatus();
+    this.getPlayersList();
+    this.getWinnerList();
+    this.getActivePlayerId();
+    this.getBluffedData();
   }
 
   @HostListener('window:beforeunload', [ '$event' ])

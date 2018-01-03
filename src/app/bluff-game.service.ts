@@ -7,9 +7,6 @@ export class BluffGameService {
   static apiUrl = 'https://cardsgameapi.herokuapp.com/bluff/';
   // static apiUrl = 'http://localhost:8989/bluff/';
   static playerKey = '';
-  static playerId = '';
-  static activePlayerId = '';
-  static bluffedCardRank = 'null';
 
   constructor(private http: HttpClient) { }
 
@@ -21,13 +18,8 @@ export class BluffGameService {
     return this.http.get<boolean>(BluffGameService.apiUrl + 'started');
   }
 
-  createPlayer(playerName: string): void {
-    if (BluffGameService.playerKey == '') {
-      this.http.post(BluffGameService.apiUrl + 'addPlayer', playerName, {responseType: 'json'}).subscribe(playerData => {
-        BluffGameService.playerId = playerData['id'];
-        BluffGameService.playerKey = playerData['key'];
-      });
-    }
+  createPlayer(playerName: string): Observable<any> {
+    return this.http.post(BluffGameService.apiUrl + 'addPlayer', playerName, {responseType: 'json'});
   }
 
   getPlayers(): Observable<any> {
