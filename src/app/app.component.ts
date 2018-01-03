@@ -2,6 +2,7 @@ import {Component, HostListener} from '@angular/core';
 import {BluffGameService} from "./bluff-game.service";
 import Stomp from 'stompjs';
 import SockJS from 'sockjs-client';
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-bluff',
@@ -26,12 +27,11 @@ export class AppComponent {
 
   openCards = [];
   info = [];
-  infoIcon = '>>';
+  infoIcon = ' ⓘ';
   winnerColors = ['yellow-text text-darken-2', 'grey-text text-darken-5', 'brown-text text-darken-2'];
   cardRanks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 
-  private socketUrl = 'https://cardsgameapi.herokuapp.com/socket';
-  // private socketUrl = 'http://localhost:8989/socket';
+  private socketUrl = environment.production ? 'https://cardsgameapi.herokuapp.com/socket' : 'http://localhost:8989/socket';
   private stompClient;
 
   constructor(private service: BluffGameService) {
@@ -80,10 +80,10 @@ export class AppComponent {
 
   createPlayer() {
     if (this.playerName != '') {
-      if (BluffGameService.playerKey == '') {
+      if (this.service.playerKey == '') {
         this.service.createPlayer(this.playerName).subscribe(playerData => {
           this.playerId = playerData['id'];
-          BluffGameService.playerKey = playerData['key'];
+          this.service.playerKey = playerData['key'];
           this.playerCreated = true;
           this.update('players');
         });
@@ -95,7 +95,7 @@ export class AppComponent {
     this.service.leaveGame().subscribe(leave => {
       if (leave) {
         this.playerCreated = false;
-        BluffGameService.playerKey = '';
+        this.service.playerKey = '';
         this.playerId = '';
         this.update('started');
         this.update('activePlayerId');
@@ -121,6 +121,12 @@ export class AppComponent {
     this.service.getPlayers().subscribe(players => {
       this.players = players;
       this.playersIds = Object.keys(this.players);
+      if (!this.players[this.playerId]) {
+        this.playerCreated = false;
+        this.service.playerKey = '';
+        this.playerId = '';
+        this.getGameStatus();
+      }
     });
   }
 
@@ -144,7 +150,7 @@ export class AppComponent {
   }
 
   getCards() {
-    if (BluffGameService.playerKey != '') {
+    if (this.service.playerKey != '') {
       this.service.getPlayerCards().subscribe(cards => {
         this.cards = cards;
       });
@@ -210,12 +216,12 @@ export class AppComponent {
   }
 
   getInfo(event){
-    if(this.infoIcon == '>>'){
+    if(this.infoIcon == ' ⓘ'){
       this.info = ['Throw', 'Show', 'Pass'];
-      this.infoIcon = "<<";
+      this.infoIcon = " X";
     } else {
       this.info = ['', '', ''];
-      this.infoIcon = ">>";
+      this.infoIcon = ' ⓘ';
     }
   }
 
