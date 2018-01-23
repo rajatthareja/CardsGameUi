@@ -12,6 +12,9 @@ before_script:
 
 script:
   - ng build --prod
+
+after_success:
+  - firebase deploy --token $FIREBASE_TOKEN
   
 deploy:
   provider: pages
@@ -20,9 +23,9 @@ deploy:
   keep-history: true
   local-dir: dist
   on:
-    branch: master
-
-after_success:
-  - firebase deploy --token $FIREBASE_TOKEN
+    branch: master  
+  
+after_deploy:
   - ng build --prod --base-href cards
   - find dist -type f -exec curl --ftp-create-dirs --upload-file {} -u $FTP_USER:$FTP_PASSWORD ftp://itbt.in \;
+  
