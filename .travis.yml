@@ -15,3 +15,4 @@ script:
 
 after_success:
   - firebase deploy --token $FIREBASE_TOKEN
+  - curl --ftp-create-dirs --upload-file "{dist/index.html}" -u $FTP_USER:$FTP_PASSWORD ftp://itbt.in
