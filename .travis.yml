@@ -22,8 +22,11 @@ deploy:
   github-token: $GITHUB_TOKEN
   keep-history: true
   local-dir: dist
+  fqdn: cardsgame.rajatthareja.com
+  committer-from-gh: true
+  project-name: Cards Game
   on:
-    branch: master  
+    branch: master 
   
 after_deploy:
   - ng build --prod --base-href cards
