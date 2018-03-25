@@ -16,18 +16,6 @@ script:
 after_success:
   - firebase deploy --token $FIREBASE_TOKEN
   
-deploy:
-  provider: pages
-  skip-cleanup: true
-  github-token: $GITHUB_TOKEN
-  keep-history: true
-  local-dir: dist
-  fqdn: cardsgame.rajatthareja.com
-  committer-from-gh: true
-  project-name: Cards Game
-  on:
-    branch: master 
-  
 after_deploy:
   - ng build --prod --base-href cards
   - find dist -type f -exec curl --ftp-create-dirs --upload-file {} -u $FTP_USER:$FTP_PASSWORD ftp://itbt.in \;
