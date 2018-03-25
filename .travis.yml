@@ -15,8 +15,6 @@ script:
 
 after_success:
   - firebase deploy --token $FIREBASE_TOKEN
-  
-after_deploy:
   - ng build --prod --base-href cards
   - find dist -type f -exec curl --ftp-create-dirs --upload-file {} -u $FTP_USER:$FTP_PASSWORD ftp://itbt.in \;
   
